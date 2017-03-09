@@ -1,0 +1,94 @@
+<html>
+
+<head>
+  <title>Chat app</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.2/angular.min.js"></script>
+  <script src="https://cdn.firebase.com/js/client/2.2.4/firebase.js"></script>
+  <script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"></script>
+  <script src="app.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/foundation/6.2.0/foundation.min.css">
+</head>
+
+<body ng-app="chatapp" ng-controller="MainCtrl as app">
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <ul class="menu">
+        <li class="menu-text">{{ app.name }}</li>
+      </ul>
+    </div>
+    <div class="top-bar-right">
+
+      <ul class="menu" ng-show="app.auth.loggedIn">
+        <li class="menu-text"><em>Di algo {{ app.auth.name }}!</em></li>
+      </ul>
+    </div>
+  </div>
+
+
+  <div class="row" ng-hide="app.auth.loggedIn">
+    <div class="small-12 medium-6 medium-offset-3 columns">
+      <hr class="invisible" />
+      <form ng-submit="app.auth.logInUser()" name="loginForm" class="callout">
+        <h2>Ingresar al chat!</h2>
+        <p>
+          <label for="">Tu nombre</label>
+          <input type="text" ng-model="app.auth.name" required />
+        </p>
+        <p><button class="button expanded" type="submit">Ingresar</button></p>
+      </form>
+    </div>
+  </div>
+
+
+  <div class="row" ng-show="app.auth.loggedIn">
+    <div class="small-12 medium-6 medium-offset-3 end columns">
+      <ul class="messages no-bullet" message-box>
+        <li ng-repeat="message in app.messages.data">
+          <div class="callout">
+            <div class="row" ng-if="!message.messageFrom">
+              <div class="small-1 columns">
+                <span class="label radius">
+                  {{ message.name | limitTo : 1 }}
+                </span>
+              </div>
+              <div class="small-11 columns">
+                <strong>{{message.name}}</strong>
+                <p>{{message.text}}</p>
+                <p>{{message.time |  date : format : timezone}}</p>
+              </div>
+              <ul class="messages no-bullet">
+                <li ng-repeat="message in app.messages.data">
+              <div class="row"  ng-if="message.messageFrom">
+                <div class="small-11 columns">
+                  <strong>Respuesta de: {{message.name}}</strong>
+                  <p>{{message.text}}</p>
+                  <p>{{message.time |  date : format : timezone}}</p>
+                </div>
+              </div>
+            </li>
+          </ul>
+
+              <div class="row collapse postfix">
+                <div class="small-9 columns">
+                  <input type="text" ng-model="app.messages[$id].newMessageResponse" ng-disabled="!app.auth.loggedIn" />
+                </div>
+                <div class="small-3 columns">
+                  <button class="button expanded" ng-click="app.messages.add(app.messages[$id].newMessageResponse,message.$id)">Enviar</button>
+                </div>
+              </div>
+            </div>
+        </li>
+      </ul>
+        <div class="row collapse postfix">
+          <div class="small-9 columns">
+            <input type="text" ng-model="app.messages.newMessage" />
+          </div>
+          <div class="small-3 columns">
+            <button class="button expanded" ng-click="app.messages.add(app.messages.newMessage,null)">Send</button>
+          </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
